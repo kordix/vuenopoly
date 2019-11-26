@@ -45,8 +45,8 @@ export default {
             if(this.dicethrown==true){
             return
             }
-            // this.dice = Math.floor(Math.random()*6+1);
-            this.dice = 1;
+            this.dice = Math.floor(Math.random()*6+1);
+            // this.dice = 1;
             this.$store.dispatch('addLogEntry',`gracz `+this.currentPlayer.name+' rzucił kością na '+this.dice)
             this.move(this.dice);
             this.dicethrown = true;
