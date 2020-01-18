@@ -12,6 +12,7 @@
               <p>Właściciel: {{currentField.owner}} </span></p>
               <button @click="buy()" v-if="buybool">Kup działkę</button>
               <!-- <button  @click="startbet" v-if="buybool">Licytuj działkę</button> -->
+              <!-- <button @click="buyHouse">Kup dom</button> -->
 
           </div>
           <licytacja v-if="betBool" @buy="function(a,b,c){buy(a,b,c)}"></licytacja>
@@ -80,6 +81,10 @@ export default {
                 this.betBool=false;
                 return
             }
+            if(this.currentField.price == 0){
+                return
+            }    
+
             if(this.owner != ''){
                 this.$store.dispatch('addLogEntry','działka zajęta nia ma co licytować');
                 this.betBool=false;
@@ -87,7 +92,6 @@ export default {
                 return
             }
 
-            console.log(this.owner);
 
             this.endbool=false;
             this.betBool=true;
@@ -113,7 +117,8 @@ export default {
             }else{
                 player2='red'
             }
-            amount = this.currentField.price/5;
+            amount = this.currentField.price/5+parseInt(this.currentField.houses)*30;
+            
 
             if(this.checkGroups(this.currentField.group,this.player2)==true){
                 amount = amount *2;
@@ -126,7 +131,7 @@ export default {
         buy(cost,player,mode){
             if (this.owner != ''){return}
 
-            if(!cost){cost = this.currentField.price;}
+            if(!cost){cost = this.currentField.price}
 
             if(!player){player = this.$store.getters.currentPlayer;}
 
@@ -148,12 +153,18 @@ export default {
             }
         },
         buyHouse(){
+            // if(this.currentField.price == 0)return;
+            // if(this.owner !=this.currentPlayer.name)return;
 
+            if(this.checkGroups(this.currentField.district,this.currentPlayer.name)){
+                this.currentField.houses +=1;
+            }
+            console.log(this.checkGroups(this.currentField.district,this.currentPlayer.name));
         },
 
-        checkGroups(group,player){
-            let pola = this.$store.state.fields.filter((el)=>el.group==group).length;
-            let polagracza = this.$store.state.fields.filter((el)=>el.group==group).filter((el)=>el.owner==player).length;
+        checkGroups(district,player){
+            let pola = this.$store.state.fields.filter((el)=>el.district==district).length;
+            let polagracza = this.$store.state.fields.filter((el)=>el.district==district).filter((el)=>el.owner==player).length;
 
             if(pola ==polagracza ){
                 return true
@@ -167,15 +178,14 @@ export default {
     },
     computed:{
         ...mapGetters([
-  'currentPlayer','currentField','player2'
-]),
-buybool(){
-    return this.owner !='' || this.currentPlayer.name=='agent' || this.currentField.price == 0 ? false:true;
-},
+        'currentPlayer','currentField','player2'
+        ]),
+        buybool(){
+            return this.owner !='' || this.currentPlayer.name=='agent' || this.currentField.price == 0 ? false:true;
+        },
+        test(){
 
-test(){
-
-},
+        },
 
         players(){
             return this.$store.state.players;

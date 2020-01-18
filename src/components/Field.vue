@@ -1,14 +1,20 @@
 <template>
-    <div style="position:relative">
+    <div style="position:relative" @click="setPreviewField" class="field" :class="{highlight:fieldnumber==currentPlayer.field}">
         <div class="headerdiv" :style="{background:fieldObjectColor}"></div> <span :style="{color:$parent.fields[fieldnumber].fontcolor}" style="font-weight:bold;text-align:center;display:block;height:18px; margin-top:2px;font-size:12px"> {{$parent.fields[fieldnumber].name  }} </span>
         <div style="display:flex;flex-wrap:wrap">
         <div  v-for="player in  $store.state.players" v-if="player.field==fieldnumber" class="player" style="margin:1px" :style="{color:player.color}">{{player.name}}</div>
         </div>
+        <p style="position:absolute;top:37px;"><i v-for="num in fieldobject.houses" class="fas fa-home" style="font-size:10px"></i></p>
         <span style="font-size:0.5em;position:absolute;bottom:0px;left:0px;">Owner: <span  :style="{color:$parent.fields[fieldnumber].owner }">{{$parent.fields[fieldnumber].owner}}</span></span>
+
     </div>
 </template>
 
 <script>
+import {mapState} from 'vuex';
+import {mapGetters} from 'vuex';
+
+
 export default {
     props:['fieldnumber','fieldobject'],
     data(){
@@ -16,7 +22,19 @@ export default {
 
         }
     },
+    methods:{
+        setPreviewField(){
+            this.$store.dispatch('setPreviewField',this.fieldobject);
+            this.$store.state.showPreview = true;
+        }
+    },
     computed:{
+        ...mapState([
+            'fields','showPreview'
+        ]),
+        ...mapGetters([
+            'currentPlayer'
+        ]),
         fieldObjectColor(){
             if (typeof(this.fieldobject.color) == 'undefined'){
                 return '#999'
@@ -30,9 +48,21 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .headerdiv{
     position:absolute;width:100%;height:20px;background:#999;z-index:-1000
+}
+
+.highlight{
+    background:rgba(0.9,0,0,0.1);
+}
+
+.field{
+    transition:.3s;
+}
+
+.field:hover{
+    opacity:0.8
 }
 
 

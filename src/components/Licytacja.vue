@@ -11,6 +11,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { mapActions } from 'vuex';
+
 
 
 
@@ -18,18 +20,11 @@ export default {
     data(){
         return{
             betprice:0,
-            betpriceconfirmed:null
+            betpriceconfirmed:0
         }
     },
     methods:{
         validate(){
-
-            if(parseInt(this.currentPlayerBet.money) < parseInt(this.betpriceconfirmed)) {
-                this.$store.dispatch('addLogEntry',`gracz ${this.player2} przelicytował gracza ${this.currentPlayer.name}`)
-                this.passBuyEvent();
-                return
-            }
-
             if(parseInt(this.currentPlayerBet.money) < parseInt(this.betprice)){
                 this.betprice = this.currentPlayerBet.money;
             }
@@ -38,11 +33,24 @@ export default {
             if(parseInt(this.betprice) < parseInt(this.betpriceconfirmed)){
                 this.betprice = this.betpriceconfirmed;
             }
+            
+            if(parseInt(this.currentPlayerBet.money) < parseInt(this.betpriceconfirmed)) {
+                this.$store.dispatch('addLogEntry',`gracz ${this.player2} przelicytował gracza ${this.currentPlayer.name}`)
+                this.passBuyEvent();
+            }
+
+
         },
         nextPlayerBet(){
+                  if(this.betprice == this.betpriceconfirmed){
+                 console.log(this.betpriceconfirmed);
+                this.$store.dispatch('addLogEntry','musisz zaproponować większą cene!');
+                return false
+            }
+
             this.betpriceconfirmed=this.betprice;
             this.$store.dispatch('switchPlayerBet');
-            this.validate();
+            
         },
         passBuyEvent(){
             let winner ='';
@@ -75,7 +83,11 @@ export default {
             return 'red'
         }
     }
+    },
+    mounted(){
+        this.betprice=this.currentField.price
     }
+
 }
 </script>
 

@@ -6,7 +6,7 @@
         <div id="leftfieldsgroup" style="width:5.1em;float:left">
         <field v-for="n in 5" :fieldnumber="26-n" :fieldobject="fields[26-n]" :key="fields[26-n].name" :class="'field-v'"></field>
         </div>
-        <div class="centerblock"></div>
+        <div class="centerblock"><fieldpreview></fieldpreview></div>
         <div id="rightfieldsgroup" style="width:4em;float:left">
             <field v-for="n in 5" :fieldnumber="n+7" :fieldobject="fields[n+7]" :key="fields[n+7].name" class="field-v"></field>
         </div>
@@ -20,12 +20,14 @@
 </template>
 
 <script>
-import Field from './Field.vue'
+import Field from './Field.vue';
+import Fieldpreview from './Fieldpreview.vue';
+
 
 
 export default {
     components:{
-        Field
+        Field,Fieldpreview
     },
     data(){
         return {
@@ -38,6 +40,9 @@ export default {
     computed:{
         fields(){
             return this.$store.state.fields;
+        },
+         showPreview(){
+            return this.$store.state.showPreview;
         }
     }
 }
