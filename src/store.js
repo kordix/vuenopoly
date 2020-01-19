@@ -34,14 +34,15 @@ export default new Vuex.Store({
             { name: 'radom ', price: '100', owner: '', group: 'lotniska', color: '#AACCEE', fontcolor: 'black' }
         ],
         players: [
-            { color: 'red', field: 0, name: 'red', money: 1000, groups: [], current: true },
-            { color: 'blue', field: 0, name: 'blue', money: 1000, groups: [], current: false },
+            { color: 'red', field: 0, name: 'red', money: 1200, groups: [], current: true },
+            { color: 'blue', field: 0, name: 'blue', money: 1200, groups: [], current: false },
             { color: 'gray', field: 0, name: 'agent', money: 0, current: false }
         ],
         currentPlayerId: 0,
         currentPlayerBetId: 0,
         previewField:{},
         showPreview:false,
+        winner:null,
         log: []
 
 

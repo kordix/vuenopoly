@@ -1,8 +1,10 @@
 <template>
     <div id="interfejs" style="float:left">
+          <div style="font-weight:bold" v-if="endGameBool">Koniec gry! Wygrywa {{winner}}</div>  
           <div style="flex:20%" v-if="mainDialogueBool">
               <button @click="rollDice" v-if="!dicethrown">Rzut kością</button>
               <button @click="switchPlayer" v-if="endbool" class="margin-right:5px">koniec tury</button>
+              <button v-if="surrenderbool" @click="surrender">Poddaj grę</button>
               <span>Kość: {{dice}}</span>
               <p>Aktualny gracz: <b :style="{color:currentPlayer.color}">{{currentPlayer.name}}</b> Kasa: {{currentPlayer.money}}</p>
           </div>
@@ -17,6 +19,7 @@
           </div>
           <licytacja v-if="betBool" @buy="function(a,b,c){buy(a,b,c)}"></licytacja>
           <dziennik></dziennik>
+          <div style="position:fixed;right:20px;bottom:20px">random dice<input type="checkbox" v-model="randomDiceBool"> </div>
       </div>
 </template>
 
@@ -35,10 +38,26 @@ export default {
             fieldDialogueBool:true,
             teststring:'asdf',
             betBool:false,
-            endbool:true
+            endbool:true,
+            surrenderbool:false,
+            endGameBool:false,
+            winner:null,
+            debt:0,
+            debtBool:false,
+            randomDiceBool:false
         }
     },
     methods:{
+        surrender(){
+            let player2;
+              if(this.currentPlayer.name == 'red'){
+                player2='blue'
+            }else{
+                player2='red'
+            }
+            this.endGameBool=true;
+            this.winner=player2;
+        },
         addLogEntry(arg) {
             this.$store.dispatch('addLogEntry', arg);
         },
@@ -46,8 +65,11 @@ export default {
             if(this.dicethrown==true){
             return
             }
-            this.dice = Math.floor(Math.random()*6+1);
-            // this.dice = 1;
+            if(this.randomDiceBool){
+                this.dice = Math.floor(Math.random()*6+1);
+            }else{
+                this.dice = 1;
+            }
             this.$store.dispatch('addLogEntry',`gracz `+this.currentPlayer.name+' rzucił kością na '+this.dice)
             this.move(this.dice);
             this.dicethrown = true;
@@ -56,9 +78,14 @@ export default {
             }
         },
         switchPlayer(){
+            if(this.debtBool){
+                this.$store.dispatch('addLogEntry','musisz uregulować długi zanim skończysz turę')
+                return
+            }
             this.$store.dispatch('clearLog');
             this.endbool=false;
             this.dicethrown=false;
+            this.surrendebool=false;
             this.$store.dispatch('switchPlayer');
             this.$store.dispatch('addLogEntry', `gracz ${this.currentPlayer.name} zaczyna turę`);
         },
@@ -99,6 +126,7 @@ export default {
 
         },
         pay(){
+            console.log('pay');
             if (this.currentField.owner == this.currentPlayer.name){
                 return
             }
@@ -112,19 +140,23 @@ export default {
             }
             let player2,amount;
 
+
+
             if(this.currentPlayer.name == 'red'){
                 player2='blue'
             }else{
                 player2='red'
             }
             amount = this.currentField.price/5+parseInt(this.currentField.houses)*30;
-            
 
-            if(this.checkGroups(this.currentField.group,this.player2)==true){
-                amount = amount *2;
-                console.log('działa');
+             if(this.currentPlayer.money < amount){
+                this.$store.dispatch('addLogEntry', `graczowi ${this.currentPlayer.name} skończyła się kasa. Musisz sprzedać domki i dzałki, albo oddać w hipotekę, możesz też poddać grę `);
+                this.surrenderbool=true;
+                this.debt = amount;
+                this.debtBool=true;
+                return
             }
-                this.currentPlayer.money -= amount;
+            this.currentPlayer.money -= amount;
             this.$store.dispatch('addLogEntry',`gracz ${this.currentPlayer.name} płaci graczowi ${player2} ${amount} `)
 
         },
@@ -172,9 +204,6 @@ export default {
                 return false
             }
         }
-    },
-    mounted(){
-
     },
     computed:{
         ...mapGetters([
