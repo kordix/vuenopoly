@@ -7,8 +7,8 @@ export default new Vuex.Store({
     state: {
         fields: [
             { name: 'start', price: 0, owner: '' },
-            { name: 'kam. potok', price: '100', owner: 'red', group: 'districts',district:'sopot', color: '#AA5577', fontcolor: 'white' },
-            { name: 'wyścigi', price: '100', owner: 'red', group: 'districts', district: 'sopot', color: '#AA5577', fontcolor: 'white' },
+            { name: 'kam. potok', price: '100', owner: '', group: 'districts',district:'sopot', color: '#AA5577', fontcolor: 'white' },
+            { name: 'wyścigi', price: '100', owner: '', group: 'districts', district: 'sopot', color: '#AA5577', fontcolor: 'white' },
             { name: 'rębiechowo', price: '100', owner: '', group: 'lotniska', color: '#AACCEE', fontcolor: 'black' },
             { name: 'witomino', price: '100', owner: '', group: 'districts', district: 'gdynia', color: 'blue', fontcolor: 'white' },
             { name: 'karwiny', price: '100', owner: '', group: 'districts', district: 'gdynia',color: 'blue', fontcolor: 'white' },
