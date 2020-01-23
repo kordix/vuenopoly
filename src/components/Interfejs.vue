@@ -44,7 +44,7 @@ export default {
             winner:null,
             debt:0,
             debtBool:false,
-            randomDiceBool:false
+            randomDiceBool:true
         }
     },
     methods:{
