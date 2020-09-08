@@ -39,10 +39,10 @@ export default {
     },
     computed:{
         fields(){
-            return this.$store.state.fields;
+            return this.$root.fields;
         },
          showPreview(){
-            return this.$store.state.showPreview;
+            return this.$root.showPreview;
         }
     }
 }

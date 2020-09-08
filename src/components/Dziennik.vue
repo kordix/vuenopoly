@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
 
 export default {
     data() {
@@ -16,7 +15,7 @@ export default {
     },
     methods: {
         addLogEntry(arg) {
-            this.$store.dispatch('addLogEntry', arg);
+            this.$root.addLogEntry(arg)
         }
     },
     mounted() {
@@ -24,7 +23,7 @@ export default {
     },
     computed: {
         log() {
-            return this.$store.state.log
+            return this.$root.log
         }
     }
 }

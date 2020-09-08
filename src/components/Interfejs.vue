@@ -24,7 +24,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import Licytacja from './Licytacja.vue';
 import Dziennik from './Dziennik.vue';
 
@@ -59,7 +58,7 @@ export default {
             this.winner=player2;
         },
         addLogEntry(arg) {
-            this.$store.dispatch('addLogEntry', arg);
+            this.$root.addLogEntry(arg);
         },
         rollDice(){
             if(this.dicethrown==true){
@@ -70,7 +69,7 @@ export default {
             }else{
                 this.dice = 1;
             }
-            this.$store.dispatch('addLogEntry',`gracz `+this.currentPlayer.name+' rzucił kością na '+this.dice)
+            this.$root.addLogEntry(`gracz `+this.currentPlayer.name+' rzucił kością na '+this.dice)
             this.move(this.dice);
             this.dicethrown = true;
             if(this.currentPlayer.name !='agent'){
@@ -79,23 +78,25 @@ export default {
         },
         switchPlayer(){
             if(this.debtBool){
-                this.$store.dispatch('addLogEntry','musisz uregulować długi zanim skończysz turę')
+                this.$root.addLogEntry('musisz uregulować długi zanim skończysz turę')
                 return
             }
-            this.$store.dispatch('clearLog');
+            this.$root.clearLog();
             this.endbool=false;
             this.dicethrown=false;
             this.surrendebool=false;
-            this.$store.dispatch('switchPlayer');
-            this.$store.dispatch('addLogEntry', `gracz ${this.currentPlayer.name} zaczyna turę`);
+            this.$root.switchPlayer();
+            this.$root.addLogEntry(`gracz ${this.currentPlayer.name} zaczyna turę`);
         },
         move(val){
             // this.currentPlayer +=val;
-            this.$store.getters.currentPlayer.field += val;
+            let index = this.$root.players.findIndex((el)=>el.name == this.currentPlayer.name)
+            console.log(this.$root.players[index]);
+            this.$root.players[index].field += val;
             if(this.currentPlayer.field >= 26){
-                this.$store.getters.currentPlayer.field = this.$store.getters.currentPlayer.field % 26
-                this.currentPlayer.money+=200
-                this.$store.dispatch('addLogEntry',`gracz ${this.currentPlayer.name} dostał 200 za przejście okrążenia`)
+                this.$root.players[index].field = this.currentPlayer.field % 26
+                this.$root.players[index].money+=200
+                this.$root.addLogEntry(`gracz ${this.$root.currentPlayer.name} dostał 200 za przejście okrążenia`)
             }
             this.handleField();
         },
@@ -113,7 +114,7 @@ export default {
             }    
 
             if(this.owner != ''){
-                this.$store.dispatch('addLogEntry','działka zajęta nia ma co licytować');
+                this.$root.addLogEntry('działka zajęta nia ma co licytować');
                 this.betBool=false;
                 this.endbool=true;
                 return
@@ -150,14 +151,14 @@ export default {
             amount = this.currentField.price/5+parseInt(this.currentField.houses)*30;
 
              if(this.currentPlayer.money < amount){
-                this.$store.dispatch('addLogEntry', `graczowi ${this.currentPlayer.name} skończyła się kasa. Musisz sprzedać domki i dzałki, albo oddać w hipotekę, możesz też poddać grę `);
+                this.$root.addLogEntry(`graczowi ${this.currentPlayer.name} skończyła się kasa. Musisz sprzedać domki i dzałki, albo oddać w hipotekę, możesz też poddać grę `);
                 this.surrenderbool=true;
                 this.debt = amount;
                 this.debtBool=true;
                 return
             }
             this.currentPlayer.money -= amount;
-            this.$store.dispatch('addLogEntry',`gracz ${this.currentPlayer.name} płaci graczowi ${player2} ${amount} `)
+            this.$root.addLogEntry(`gracz ${this.currentPlayer.name} płaci graczowi ${player2} ${amount} `)
 
         },
         buy(cost,player,mode){
@@ -165,12 +166,12 @@ export default {
 
             if(!cost){cost = this.currentField.price}
 
-            if(!player){player = this.$store.getters.currentPlayer;}
+            if(!player){player = this.currentPlayer;}
 
             if(!mode){mode='default'}
 
             if(player.money < cost){
-                this.$store.dispatch('addLogEntry', ' nie stać cię na zakup tej działki');
+                this.$root.addLogEntry('nie stać cię na zakup tej działki');
                 return
             }
             this.currentField.owner = player.name;
@@ -181,13 +182,10 @@ export default {
             if(mode=='bet'){
                 this.endbool=true;
             }else{
-                this.$store.dispatch('addLogEntry',`gracz ${player.name} kupił działkę ${this.currentField.name} za ${cost}`)
+                this.$root.addLogEntry(`gracz ${player.name} kupił działkę ${this.currentField.name} za ${cost}`)
             }
         },
         buyHouse(){
-            // if(this.currentField.price == 0)return;
-            // if(this.owner !=this.currentPlayer.name)return;
-
             if(this.checkGroups(this.currentField.district,this.currentPlayer.name)){
                 this.currentField.houses +=1;
             }
@@ -195,8 +193,8 @@ export default {
         },
 
         checkGroups(district,player){
-            let pola = this.$store.state.fields.filter((el)=>el.district==district).length;
-            let polagracza = this.$store.state.fields.filter((el)=>el.district==district).filter((el)=>el.owner==player).length;
+            let pola = this.$root.fields.filter((el)=>el.district==district).length;
+            let polagracza = this.$root.fields.filter((el)=>el.district==district).filter((el)=>el.owner==player).length;
 
             if(pola ==polagracza ){
                 return true
@@ -206,9 +204,15 @@ export default {
         }
     },
     computed:{
-        ...mapGetters([
-        'currentPlayer','currentField','player2'
-        ]),
+        currentPlayer(){
+            return this.$root.currentPlayer
+        },
+        currentField(){
+            return this.$root.currentField
+        },
+        player2(){
+            return this.$root.player2
+        },
         buybool(){
             return this.owner !='' || this.currentPlayer.name=='agent' || this.currentField.price == 0 ? false:true;
         },
@@ -217,13 +221,10 @@ export default {
         },
 
         players(){
-            return this.$store.state.players;
+            return this.$root.players;
         },
-        // currentPlayer(){
-        //     return this.$store.getters.currentPlayer;
-        // },
         currentField(){
-            return this.$store.getters.currentField;
+            return this.$root.currentField;
         },
         owner(){
             return this.currentField.owner;

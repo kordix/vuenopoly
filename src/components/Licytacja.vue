@@ -10,12 +10,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { mapActions } from 'vuex';
-
-
-
-
 export default {
     data(){
         return{
@@ -35,7 +29,7 @@ export default {
             }
             
             if(parseInt(this.currentPlayerBet.money) < parseInt(this.betpriceconfirmed)) {
-                this.$store.dispatch('addLogEntry',`gracz ${this.player2} przelicytował gracza ${this.currentPlayer.name}`)
+                this.$root.addLogEntry(`gracz ${this.player2} przelicytował gracza ${this.currentPlayer.name}`)
                 this.passBuyEvent();
             }
 
@@ -44,12 +38,12 @@ export default {
         nextPlayerBet(){
                   if(this.betprice == this.betpriceconfirmed){
                  console.log(this.betpriceconfirmed);
-                this.$store.dispatch('addLogEntry','musisz zaproponować większą cene!');
+                this.$root.addLogEntry('musisz zaproponować większą cene!');
                 return false
             }
 
             this.betpriceconfirmed=this.betprice;
-            this.$store.dispatch('switchPlayerBet');
+            this.$root.switchPlayerBet();
             
         },
         passBuyEvent(){
@@ -60,23 +54,29 @@ export default {
                 winner='red'
             }
 
-            let player = this.$store.state.players.find((el)=>el.name==winner)
+            let player = this.$root.players.find((el)=>el.name==winner)
 
             if(player.money < this.betpriceconfirmed){
-                this.$store.dispatch('addLogEntry', ' nie stać cię na zakup tej działki');
+                this.$root.addLogEntry('nie stać cię na zakup tej działki');
                 return
             }
 
             this.$emit('buy',this.betpriceconfirmed,player,'bet');
-            this.$store.dispatch('addLogEntry', winner+' wygrywa licytację na działkę '+this.currentField.name+' za '+this.betpriceconfirmed );
+            this.$root.addLogEntry(winner+' wygrywa licytację na działkę '+this.currentField.name+' za '+this.betpriceconfirmed );
 
         }
     },
     computed:{
-        ...mapGetters([
-      'currentPlayer','currentPlayerBet','currentField'
-    ]),
-    player2(){
+        currentPlayer(){
+            return this.$root.currentPlayer;
+        },
+         currentPlayerBet(){
+            return this.$root.currentPlayerBet;
+        },
+         currentField(){
+            return this.$root.currentField;
+        },
+        player2(){
         if(this.currentPlayerBet.name=='red'){
             return 'blue';
         }else{

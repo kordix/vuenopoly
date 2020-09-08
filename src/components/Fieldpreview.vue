@@ -12,9 +12,6 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
-import {mapGetters} from 'vuex';
-
 
 export default {
     data(){
@@ -34,12 +31,15 @@ export default {
         }
     },
     computed:{
-        ...mapState([
-            'previewField','showPreview'
-        ]),
-        ...mapGetters([
-            'currentPlayer'
-        ]) 
+        previewField(){
+            return this.$root.previewField
+        },
+        showPreview(){
+            return this.$root.showPreview;
+        },
+        currentPlayer(){
+            return this.$root.currentPlayer
+        }
     },
     mounted(){
 
@@ -55,17 +55,17 @@ export default {
             }   
         },
         switchPreview(){
-            this.$store.state.showPreview = !this.$store.state.showPreview;
+            this.$root.showPreview = !this.$root.showPreview;
         },
            buyHouse(){
             if(this.checkGroups(this.previewField.district,this.currentPlayer.name)){
                 this.previewField.houses +=1;
-                this.$store.getters.currentPlayer.money -=100;
+                this.$root.currentPlayer.money -=100;
             }
         },
         checkGroups(district,player){
-            let pola = this.$store.state.fields.filter((el)=>el.district==district).length;
-            let polagracza = this.$store.state.fields.filter((el)=>el.district==district).filter((el)=>el.owner==player).length;
+            let pola = this.$root.fields.filter((el)=>el.district==district).length;
+            let polagracza = this.$root.fields.filter((el)=>el.district==district).filter((el)=>el.owner==player).length;
             console.log(pola);
             console.log(polagracza);
             if(pola ==polagracza ){
